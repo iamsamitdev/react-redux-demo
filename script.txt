@@ -1,0 +1,92 @@
+การใช้งาน React ร่วมกับ Redux เบื้องต้น
+----
+Step 1: Create react project
+--
+npx create-react-app react-redux-demo
+
+Step 2: ติดตั้ง dependencies ที่ต้องใช้สำหรับ redux
+---
+npm install redux react-redux redux-thunk
+
+Step 3: สร้าง counterAction.js ใน redux/actions
+---
+// Action Types
+export const INCREMENT_COUNTER = 'INCREMENT_COUNTER'
+export const DECREMENT_COUNTER = 'DECREMENT_COUNTER'
+
+// Action Creator
+const incrementCounter = () => ({
+    type: INCREMENT_COUNTER,
+    // payload: {},
+    // data: []
+})
+
+const decrementCounter = () => ({
+    type: DECREMENT_COUNTER,
+    // payload: {},
+    // data: []
+})
+
+Step 4: สร้าง counterReducer.js ใน redux/reducers
+---
+import {INCREMENT_COUNTER, DECREMENT_COUNTER} from '../actions/counterActions';
+
+const counterReducer = (state = {value: 0}, action) => {
+    switch (action.type){
+        case INCREMENT_COUNTER:
+            return {...state, value: state.value + 1 }
+        case DECREMENT_COUNTER:
+            return {...state, value: state.value - 1 }
+        default:
+            return {...state }
+    }
+}
+
+export default counterReducer
+
+Step 5: สร้างไฟล์ rootReducer.js ใน redux/reducers
+---
+import { combineReducers } from 'redux';
+import counterReducer from './counterReducer'
+import productReducer from './productReducer'
+
+const rootReducer = combineReducers({
+    counter: counterReducer,
+    product: productReducer
+})
+
+export default rootReducer
+
+// {
+//     counter: { value: 0 }
+// }
+
+Step 6: สร้างไฟล์ store.js ใน redux/
+---
+/* eslint-disable no-mixed-operators */
+import {createStore, applyMiddleware, compose} from 'redux'
+import thunk from 'redux-thunk'
+import rootReducer from './reducers/rootReducer'
+
+const middleware = [thunk]
+
+// กำหนดให้แสดง log ต่างๆ ผ่าน redux-devtool
+const composeEnhancers = typeof window != 'undefined' && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
+
+export const store = createStore(rootReducer, composeEnhancers(applyMiddleware(...middleware)))
+
+Step 7: การแก้ไขไฟล์ index.js
+---
+import React from 'react'
+import ReactDOM from 'react-dom'
+import './index.css'
+import App from './components/App'
+import { Provider } from 'react-redux'
+import { store } from './redux/store'
+
+ReactDOM.render(
+  <Provider store={store}>
+    <App />
+  </Provider>,
+  document.getElementById('root')
+)
